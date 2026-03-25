@@ -1,0 +1,9 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/seanqzdz/public_html/
+    - /bin/cp -R index.html $DEPLOYPATH
+    - /bin/cp -R assets $DEPLOYPATH
+    - /bin/cp seanetik_icone_4096.png $DEPLOYPATH
+    - /bin/cp seanetik_logo_horizontal_noir_8196.png $DEPLOYPATH
+    - /bin/cp seanetik_logo_vertical_blanc_8192.png $DEPLOYPATH
