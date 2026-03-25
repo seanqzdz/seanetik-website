@@ -22,7 +22,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-$destinataire = 'jeremie.levesque@seanetik.com';
+$destinataire = 'jeremie.levesque@seanetik.com, maxime.leblanc@seanetik.com, info@seanetik.com';
 $sujet        = "Nouveau message — seanetik.ca ($nom)";
 
 $corps = "Nouveau message reçu via le site seanetik.ca\n\n";
