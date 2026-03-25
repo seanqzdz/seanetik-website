@@ -1284,20 +1284,20 @@
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
             <div>
               <label class="form-label">Nom</label>
-              <input type="text" class="form-input" placeholder="Votre nom" required>
+              <input type="text" name="nom" class="form-input" placeholder="Votre nom" required>
             </div>
             <div>
               <label class="form-label">Entreprise</label>
-              <input type="text" class="form-input" placeholder="Votre entreprise">
+              <input type="text" name="entreprise" class="form-input" placeholder="Votre entreprise">
             </div>
           </div>
           <div style="margin-bottom:14px;">
             <label class="form-label">Email</label>
-            <input type="email" class="form-input" placeholder="votre@email.com" required>
+            <input type="email" name="email" class="form-input" placeholder="votre@email.com" required>
           </div>
           <div style="margin-bottom:24px;">
             <label class="form-label">Message</label>
-            <textarea class="form-input" rows="5" placeholder="Votre message..." style="resize:vertical;" required></textarea>
+            <textarea name="message" class="form-input" rows="5" placeholder="Votre message..." style="resize:vertical;" required></textarea>
           </div>
           <button type="submit" id="submit-btn" class="btn-primary" style="width:100%; justify-content:center; padding:16px;">
             Envoyer le message
@@ -1471,10 +1471,31 @@
   function handleSubmit(e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
-    btn.innerHTML = '✓ Message envoyé !';
-    btn.style.background = 'var(--vert)';
-    btn.style.boxShadow = '0 6px 24px rgba(126,198,54,0.4)';
+    const form = e.target;
+    const data = new FormData(form);
+
+    btn.innerHTML = 'Envoi en cours…';
     btn.disabled = true;
+
+    fetch('contact.php', { method: 'POST', body: data })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          btn.innerHTML = '✓ Message envoyé !';
+          btn.style.background = 'var(--vert)';
+          btn.style.boxShadow = '0 6px 24px rgba(126,198,54,0.4)';
+          form.reset();
+        } else {
+          btn.innerHTML = 'Erreur — réessayez';
+          btn.style.background = '#c0392b';
+          btn.disabled = false;
+        }
+      })
+      .catch(() => {
+        btn.innerHTML = 'Erreur — réessayez';
+        btn.style.background = '#c0392b';
+        btn.disabled = false;
+      });
   }
 
   // ─── Smooth close mobile menu on link click ───
