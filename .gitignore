@@ -1,0 +1,22 @@
+# Outils de développement local
+node_modules/
+serve.mjs
+screenshot.mjs
+screenshot-sections.mjs
+screenshot-all-sections.mjs
+CLAUDE.md
+
+# Dossiers temporaires / dev
+temporary screenshots/
+backup_site_web/
+poppler-25.12.0/
+code/
+contenu/
+
+# Fichiers lourds / inutiles en prod
+*.pdf
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.log

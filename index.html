@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seanetik — Nettoyage de coque robotisé</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --azure: #349ADA;
+      --vert: #7EC636;
+      --marine: #0D1E2E;
+      --navy: #1E3A52;
+      --brume: #EEF3F8;
+      --blanc: #FFFFFF;
+      --ardoise: #3A5A72;
+      --gris: #7A9AB0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      color: var(--ardoise);
+      background: var(--brume);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    .f-orbitron { font-family: 'Orbitron', monospace; }
+
+    .section-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--azure);
+    }
+
+    .section-label.light { color: var(--vert); }
+
+    h1, h2, h3 {
+      font-family: 'Orbitron', monospace;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    /* ─── NAVBAR ─── */
+    #navbar {
+      transition: background 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255,255,255,0.97) !important;
+      box-shadow: 0 1px 0 rgba(52,154,218,0.12), 0 4px 24px rgba(13,30,46,0.06);
+    }
+    .nav-link {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      padding: 4px 0;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 1.5px;
+      background: var(--vert);
+      transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-link:hover { color: white; }
+    .nav-link:hover::after { width: 100%; }
+    #navbar.scrolled .nav-link { color: var(--ardoise); }
+    #navbar.scrolled .nav-link:hover { color: var(--azure); }
+
+    /* ─── BUTTONS ─── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--azure);
+      color: white;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border-radius: 5px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.22s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+      box-shadow: 0 4px 18px rgba(52,154,218,0.38), 0 1px 4px rgba(52,154,218,0.2);
+    }
+    .btn-primary:hover {
+      background: var(--vert);
+      box-shadow: 0 6px 24px rgba(126,198,54,0.42), 0 2px 6px rgba(126,198,54,0.2);
+      transform: translateY(-2px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:focus-visible { outline: 3px solid var(--vert); outline-offset: 3px; }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border-radius: 5px;
+      border: 2px solid rgba(255,255,255,0.35);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.22s ease, background 0.22s ease, color 0.22s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-outline:hover {
+      border-color: white;
+      color: white;
+      background: rgba(255,255,255,0.07);
+      transform: translateY(-2px);
+    }
+    .btn-outline:active { transform: translateY(0); }
+    .btn-outline:focus-visible { outline: 3px solid var(--vert); outline-offset: 3px; }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+    .reveal-d4 { transition-delay: 0.4s; }
+
+    /* ─── STAT CARD ─── */
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 22px 24px;
+      border: 1px solid rgba(52,154,218,0.12);
+      box-shadow: 0 2px 8px rgba(52,154,218,0.07), 0 8px 32px rgba(13,30,46,0.05);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .stat-icon {
+      flex-shrink: 0;
+      width: 52px;
+      height: 52px;
+      background: rgba(52,154,218,0.08);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── FEATURE DOT ─── */
+    .feat-dot {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--vert);
+      margin-top: 7px;
+    }
+
+    /* ─── TESTIMONIAL ─── */
+    .testimonial {
+      padding: 28px 28px 24px;
+      background: white;
+      border-radius: 14px;
+      border: 1.5px solid rgba(52,154,218,0.44);
+      box-shadow: 0 2px 8px rgba(13,30,46,0.45), 0 12px 40px rgba(13,30,46,0.24);
+    }
+    .quote-mark {
+      font-size: 2.8rem;
+      font-family: Georgia, serif;
+      line-height: 1;
+      color: var(--azure);
+      opacity: 0.8;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* ─── PARTNER LOGO IN MARQUEE ─── */
+    .partner-item img {
+      height: 152px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
+      filter: grayscale(0.15) opacity(0.9);
+      transition: filter 0.28s ease;
+      display: block;
+    }
+    .partner-item:hover img { filter: none; }
+
+    /* ─── ARMATEUR MANIFESTO ─── */
+    .armateur-manifesto-item {
+      padding: 12px 0;
+      width: 100%;
+      text-align: center;
+    }
+    .armateur-manifesto-sep {
+      width: 36px;
+      height: 1px;
+      background: rgba(52,154,218,0.22);
+      margin: 0 auto;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .armateur-manifesto-item:hover .armateur-manifesto-sep {
+      width: 80px;
+      background: rgba(52,154,218,0.55);
+    }
+
+    /* ─── MILESTONE ─── */
+    .milestone-icon {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      background: rgba(52,154,218,0.09);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    /* ─── TEAM CARD ─── */
+    .team-card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(13,30,46,0.05), 0 8px 32px rgba(13,30,46,0.04);
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+    }
+    .team-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(52,154,218,0.15), 0 16px 48px rgba(13,30,46,0.08);
+    }
+    /* Smooth downscaling for high-res photos */
+    .team-card img {
+      image-rendering: -webkit-optimize-contrast;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    /* ─── SPONSOR CARD ─── */
+    .sponsor-card {
+      background: var(--brume);
+      border: 1.5px solid rgba(52,154,218,0.15);
+      border-radius: 16px;
+      padding: 40px 48px;
+      text-align: center;
+      min-width: 200px;
+      max-width: 240px;
+      transition: border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .sponsor-card:hover {
+      border-color: rgba(52,154,218,0.4);
+      box-shadow: 0 4px 24px rgba(52,154,218,0.1);
+    }
+
+    /* ─── MARQUEE ─── */
+    .marquee-wrap {
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      will-change: transform;
+    }
+    .partner-item {
+      padding: 14px 40px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ardoise);
+      opacity: 0.72;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      cursor: default;
+      transition: opacity 0.25s ease, color 0.25s ease;
+    }
+    .partner-item:hover { opacity: 1; color: var(--azure); }
+    .partner-sep {
+      padding: 0 8px;
+      color: rgba(122,154,176,0.3);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ─── FORM ─── */
+    .form-input {
+      width: 100%;
+      background: white;
+      border: 1.5px solid rgba(52,154,218,0.18);
+      border-radius: 7px;
+      padding: 13px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--ardoise);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-input:focus {
+      border-color: var(--azure);
+      box-shadow: 0 0 0 3px rgba(52,154,218,0.11);
+    }
+    .form-input::placeholder { color: var(--gris); }
+    .form-label {
+      display: block;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ardoise);
+      margin-bottom: 8px;
+    }
+
+    /* ─── BIG STAT ─── */
+    .big-num {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(3.2rem, 6vw, 5rem);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--vert);
+    }
+
+    /* ─── MISC ─── */
+    .armateur-pill {
+      background: white;
+      border: 1.5px solid rgba(52,154,218,0.15);
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--navy);
+      transition: border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
+    }
+    .armateur-pill:hover {
+      border-color: var(--azure);
+      color: var(--azure);
+      box-shadow: 0 2px 12px rgba(52,154,218,0.12);
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.25; transform: scaleY(0.9); }
+      50% { opacity: 0.7; transform: scaleY(1.1); }
+    }
+
+    /* ─── NAV ACTIVE SECTION ─── */
+    .nav-link.active { color: var(--azure) !important; }
+    .nav-link.active::after { width: 100% !important; background: var(--azure); }
+    #navbar.scrolled .nav-link.active { color: var(--azure) !important; }
+
+    /* ─── ARMATEUR HOVER GLOW ─── */
+    .armateur-wow {
+      cursor: default;
+      display: inline-block;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+    }
+    .armateur-wow:hover {
+      color: var(--azure) !important;
+      text-shadow: 0 0 48px rgba(52,154,218,0.6), 0 0 96px rgba(52,154,218,0.25);
+    }
+
+    /* ─── TILT COLLAGE ─── */
+    .tilt-collage {
+      will-change: transform;
+      transform-style: preserve-3d;
+    }
+
+    /* ─── BOAT FLOAT ─── */
+    @keyframes boatFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-9px); }
+    }
+    .boat-float { animation: boatFloat 4.5s ease-in-out infinite; }
+
+    /* ─── ARROW DRAW ANIMATION ─── */
+    .arrow-line {
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+      transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .arrow-head {
+      stroke-dasharray: 21;
+      stroke-dashoffset: 21;
+      transition: stroke-dashoffset 0.32s cubic-bezier(0.4, 0, 0.2, 1) 0.38s;
+    }
+    #arrow-v1v2.drawn .arrow-line  { stroke-dashoffset: 0; }
+    #arrow-v1v2.drawn .arrow-head  { stroke-dashoffset: 0; }
+  </style>
+</head>
+
+<body>
+
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 px-6 py-4" style="background: transparent;">
+  <div style="max-width:1280px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;">
+
+    <a href="#" style="display:flex; align-items:center; text-decoration:none;">
+      <img src="seanetik_logo_horizontal_noir_8196.png" id="logo-dark" alt="Seanetik"
+        style="height:32px; display:none; transition:opacity 0.3s ease;">
+      <img src="seanetik_logo_vertical_blanc_8192.png" id="logo-white" alt="Seanetik"
+        style="height:40px; display:block; transition:opacity 0.3s ease;">
+    </a>
+
+    <!-- Desktop links -->
+    <div style="display:flex; align-items:center; gap:36px;" class="hidden md:flex">
+      <a href="#solution" class="nav-link">Solution</a>
+      <a href="#validation" class="nav-link">Validation</a>
+      <a href="#equipe" class="nav-link">Équipe</a>
+      <a href="#partenaires" class="nav-link">Partenaires</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+
+    <a href="#contact" class="btn-primary hidden md:inline-flex" style="padding:10px 20px; font-size:0.58rem;">
+      Nous contacter
+    </a>
+
+    <button id="mobile-btn" aria-label="Menu"
+      style="display:none; background:none; border:none; cursor:pointer; padding:6px; color:white;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" style="display:none; padding:16px 0 8px; border-top:1px solid rgba(255,255,255,0.1); margin-top:12px;">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <a href="#solution" class="nav-link">Solution</a>
+      <a href="#validation" class="nav-link">Validation</a>
+      <a href="#equipe" class="nav-link">Équipe</a>
+      <a href="#partenaires" class="nav-link">Partenaires</a>
+      <a href="#contact" class="nav-link" style="color:var(--vert);">Nous contacter →</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<section style="position:relative; min-height:100vh; display:flex; align-items:center; background:var(--marine); overflow:hidden;">
+
+  <!-- Background image — expanded for parallax -->
+  <div id="hero-bg" style="position:absolute; top:-12%; left:0; right:0; bottom:0; will-change:transform;">
+    <img src="assets/images/Estuaire-pointe-a-carcyPQ_2018-58.webp" alt="Port de Québec"
+      style="width:100%; height:112%; object-fit:cover; object-position:center 40%;">
+    <!-- Primary gradient -->
+    <div style="position:absolute; inset:0; background:linear-gradient(120deg, rgba(13,30,46,0.85) 0%, rgba(13,30,46,0.6) 55%, rgba(13,30,46,0.35) 100%);"></div>
+    <!-- Azure radial glow -->
+    <div style="position:absolute; inset:0; background:radial-gradient(ellipse 60% 70% at 20% 60%, rgba(52,154,218,0.12) 0%, transparent 70%);"></div>
+    <!-- Bottom vignette -->
+    <div style="position:absolute; bottom:0; left:0; right:0; height:220px; background:linear-gradient(to top, rgba(13,30,46,0.7) 0%, transparent 100%);"></div>
+    <!-- Grain -->
+    <div style="position:absolute; inset:0; opacity:0.03; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%223%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>'); background-size:200px;"></div>
+  </div>
+
+  <!-- Content -->
+  <div style="position:relative; z-index:10; max-width:1280px; margin:0 auto; padding:140px 24px 100px; width:100%;">
+    <div style="max-width:680px;">
+
+      <!-- Label bar -->
+      <div class="reveal" style="display:flex; align-items:center; gap:12px; margin-bottom:28px;">
+        <div style="height:1.5px; width:40px; background:var(--vert);"></div>
+        <span style="font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--vert);">Saint-Laurent · Québec, Canada</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="reveal reveal-d1" style="font-weight:900; font-size:clamp(2.4rem, 5vw, 4.4rem); color:white; margin-bottom:28px;">
+        Votre navire<br>
+        traîne un parachute.<br>
+        <span style="color:var(--azure);">On coupe les cordes.</span>
+      </h1>
+
+      <!-- Sub -->
+      <p class="reveal reveal-d2" style="font-size:1.08rem; font-weight:300; line-height:1.8; color:rgba(255,255,255,0.72); margin-bottom:40px; max-width:560px;">
+        Seanetik développe le seul service de nettoyage de coque robotisé avec capture des biosalissures disponible en Amérique du Nord. Économisez de
+        <strong style="color:var(--vert); font-weight:600;">100 000$ à 300 000$</strong>
+        par navire par année, sans jamais immobiliser votre flotte.
+      </p>
+
+      <!-- CTA -->
+      <div class="reveal reveal-d3" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:64px;">
+        <a href="#contact" class="btn-primary">Nous contacter</a>
+        <a href="#solution" class="btn-outline">Notre solution</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scroll cue -->
+  <div style="position:absolute; bottom:32px; left:50%; transform:translateX(-50%); z-index:10; display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0.5;">
+    <div style="width:1px; height:44px; background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.7)); animation:scrollPulse 2.2s ease-in-out infinite;"></div>
+  </div>
+
+  <!-- Photo credit -->
+  <div style="position:absolute; bottom:20px; right:20px; z-index:10; font-size:0.62rem; color:rgba(255,255,255,0.35); font-family:'Inter',sans-serif; letter-spacing:0.04em;">
+    Crédit photo : Port de Québec
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     LE PROBLÈME
+══════════════════════════════════════════════ -->
+<section id="probleme" style="padding:96px 24px; background:#07101A; overflow:hidden; position:relative;">
+
+  <!-- Subtle depth glows -->
+  <div style="position:absolute; top:10%; right:15%; width:45%; height:60%; border-radius:50%; background:radial-gradient(ellipse, rgba(52,154,218,0.07) 0%, transparent 70%); pointer-events:none;"></div>
+  <div style="position:absolute; bottom:0; left:10%; width:35%; height:40%; border-radius:50%; background:radial-gradient(ellipse, rgba(52,154,218,0.04) 0%, transparent 70%); pointer-events:none;"></div>
+
+  <div style="max-width:1280px; margin:0 auto; position:relative; z-index:1;">
+
+    <div class="reveal" style="text-align:center; margin-bottom:72px;">
+      <div class="section-label" style="margin-bottom:12px;">Le problème</div>
+      <h2 style="font-weight:800; font-size:clamp(1.8rem,3.5vw,2.8rem); color:white; max-width:680px; margin:0 auto;">
+        Les biosalissures : un enjeu invisible,<br><span style="color:var(--azure);">un coût bien réel.</span>
+      </h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;">
+
+      <!-- Left: image -->
+      <div class="reveal">
+        <div style="position:relative; border-radius:18px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.6); height:520px;">
+          <img src="assets/images/Hull-fouling-invasive-species-e1509360519300.jpg"
+            alt="Coque infestée de biosalissures"
+            style="width:100%; height:100%; object-fit:cover; object-position:center; display:block; position:absolute; inset:0;">
+          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(7,16,26,0.7) 0%, transparent 50%);"></div>
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:20px 24px;">
+            <span style="font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.5);">Biosalissures · Macro-encrassement</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: aggressive stats + text -->
+      <div>
+        <p class="reveal" style="font-size:1rem; line-height:1.82; color:rgba(255,255,255,0.52); margin-bottom:24px;">
+          Algues, moules et autres organismes marins s'accumulent sous les coques des navires et agissent comme un
+          <strong style="color:rgba(255,255,255,0.85);">parachute permanent</strong>. Plus ils s'accumulent, plus le navire force pour maintenir sa vitesse, et plus les coûts explosent.
+        </p>
+
+        <!-- Aggressive stats — no icons -->
+        <div style="display:flex; flex-direction:column;">
+          <div class="reveal reveal-d1" style="padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="font-family:'Orbitron',monospace; font-weight:900; font-size:clamp(3.2rem,6.5vw,5.2rem); color:var(--azure); letter-spacing:-0.04em; line-height:1;">+30%</div>
+            <div style="font-size:0.9rem; color:rgba(255,255,255,0.45); margin-top:8px; letter-spacing:0.02em;">de carburant consommé, dans les cas sévères</div>
+          </div>
+          <div class="reveal reveal-d2" style="padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="font-family:'Orbitron',monospace; font-weight:900; font-size:clamp(3.2rem,6.5vw,5.2rem); color:var(--azure); letter-spacing:-0.04em; line-height:1;">+50%</div>
+            <div style="font-size:0.9rem; color:rgba(255,255,255,0.45); margin-top:8px; letter-spacing:0.02em;">d'émissions de GES</div>
+          </div>
+          <div class="reveal reveal-d3" style="padding:16px 0;">
+            <div style="font-family:'Orbitron',monospace; font-weight:900; font-size:clamp(3.2rem,6.5vw,5.2rem); color:var(--vert); letter-spacing:-0.04em; line-height:1;">70%</div>
+            <div style="font-size:0.9rem; color:rgba(255,255,255,0.45); margin-top:8px; letter-spacing:0.02em;">des espèces invasives mondiales sont transportées par les coques</div>
+          </div>
+        </div>
+
+        <!-- IMO warning -->
+        <div class="reveal reveal-d4" style="background:rgba(52,154,218,0.08); border-left:4px solid var(--azure); border-radius:0 10px 10px 0; padding:20px 24px; margin-top:20px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.62rem; font-weight:700; color:var(--azure); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">⚠ Échéance 2030</div>
+          <p style="font-size:0.88rem; color:rgba(255,255,255,0.6); line-height:1.75; margin:0;">
+            Dès 2030, l'Organisation Maritime Internationale (IMO) interdira tout nettoyage <strong style="color:rgba(255,255,255,0.9);">sans capture des biosalissures</strong>. Les opérations manuelles de plongeurs seront non conformes.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #probleme > div > div:last-child { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     NOTRE SOLUTION
+══════════════════════════════════════════════ -->
+<section id="solution" style="padding:96px 24px; background:var(--brume); position:relative; overflow:hidden;">
+
+  <!-- Subtle azure radial glow -->
+  <div style="position:absolute; top:-10%; right:-5%; width:50%; height:70%; border-radius:50%; background:radial-gradient(ellipse, rgba(52,154,218,0.06) 0%, transparent 70%); pointer-events:none;"></div>
+
+  <div style="max-width:1280px; margin:0 auto; position:relative; z-index:1;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:center; overflow:visible;">
+
+      <!-- Left: content -->
+      <div style="position:relative; z-index:2;">
+        <div class="section-label reveal" style="margin-bottom:12px;">Notre solution</div>
+        <h2 class="reveal reveal-d1" style="font-weight:800; font-size:clamp(1.8rem,3vw,2.6rem); color:var(--marine); margin-bottom:24px;">
+          Nettoyer sans polluer.<br>Naviguer pour économiser.
+        </h2>
+        <p class="reveal reveal-d2" style="font-size:1rem; line-height:1.85; color:var(--ardoise); margin-bottom:40px;">
+          Seanetik offre un service de nettoyage de coque robotisé, conçu pour s'intégrer directement aux escales portuaires. Aucune immobilisation, aucun plongeur, aucun rejet dans l'environnement.
+        </p>
+
+        <!-- Features -->
+        <div style="display:flex; flex-direction:column; gap:20px; margin-bottom:44px;">
+          <div class="reveal reveal-d1" style="display:flex; gap:16px;">
+            <div class="feat-dot" style="background:var(--azure);"></div>
+            <div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.95rem; font-weight:700; color:var(--marine); letter-spacing:0.05em; margin-bottom:5px;">Nettoyage quand vous le décidez</div>
+              <div style="font-size:0.88rem; color:var(--ardoise); line-height:1.72;">La technologie Seanetik intervient efficacement à tous les stades d'encrassement, du microfilm au macro-encrassement.</div>
+            </div>
+          </div>
+          <div class="reveal reveal-d2" style="display:flex; gap:16px;">
+            <div class="feat-dot" style="background:var(--azure);"></div>
+            <div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.95rem; font-weight:700; color:var(--marine); letter-spacing:0.05em; margin-bottom:5px;">Accès aux zones complexes</div>
+              <div style="font-size:0.88rem; color:var(--ardoise); line-height:1.72;">Incluant le nez du navire, la zone offrant le meilleur retour sur investissement à nettoyer.</div>
+            </div>
+          </div>
+          <div class="reveal reveal-d3" style="display:flex; gap:16px;">
+            <div class="feat-dot" style="background:var(--azure);"></div>
+            <div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.95rem; font-weight:700; color:var(--marine); letter-spacing:0.05em; margin-bottom:5px;">Capture intégrée</div>
+              <div style="font-size:0.88rem; color:var(--ardoise); line-height:1.72;">Les biosalissures sont aspirées et filtrées en surface. Zéro rejet dans l'environnement.</div>
+            </div>
+          </div>
+          <div class="reveal reveal-d4" style="display:flex; gap:16px;">
+            <div class="feat-dot" style="background:var(--azure);"></div>
+            <div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.95rem; font-weight:700; color:var(--marine); letter-spacing:0.05em; margin-bottom:5px;">Non intrusif</div>
+              <div style="font-size:0.88rem; color:var(--ardoise); line-height:1.72;">Un nettoyage complet dans le temps d'une escale standard de 8 heures, sans impact sur les opérations portuaires.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings badge — no icon -->
+        <div class="reveal" style="display:inline-flex; align-items:center; gap:16px; background:rgba(126,198,54,0.08); border:1.5px solid rgba(126,198,54,0.25); border-radius:12px; padding:20px 28px;">
+          <div>
+            <div style="font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; color:var(--vert); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:6px;">Économies annuelles</div>
+            <div style="font-family:'Orbitron',monospace; font-weight:900; font-size:1.5rem; color:var(--marine); line-height:1.1; margin-bottom:4px;">100 000$ – 300 000$</div>
+            <div style="font-size:0.78rem; color:var(--ardoise);">par navire · paix d'esprit réglementaire incluse</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: editorial bleed boat -->
+      <div class="reveal reveal-d2" style="position:relative; z-index:1; display:flex; align-items:center; min-height:480px; overflow:visible;">
+        <!-- Wrapper: width = grosseur du bateau, translateX = position horizontale -->
+        <div style="width:140%; transform:translateX(-15%); flex-shrink:0;">
+          <img src="assets/images/bateau_4k_transparent.png" alt="Robot Seanetik V1" class="boat-float"
+            style="width:100%; display:block;">
+        </div>
+        <!-- Left fade — dissolves bleed into background -->
+        <div style="position:absolute; top:0; left:-18%; width:24%; height:100%; background:linear-gradient(to right, var(--brume) 0%, transparent 100%); pointer-events:none; z-index:2;"></div>
+        <!-- Label centered under boat -->
+        <div style="position:absolute; bottom:4px; left:0; right:0; text-align:center; z-index:3;">
+          <span style="font-family:'Orbitron',monospace; font-size:0.54rem; font-weight:700; color:var(--azure); letter-spacing:0.16em; text-transform:uppercase; opacity:0.6;">Rendu conceptuel · Robot V1</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #solution > div > div:last-child { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     LA TECHNOLOGIE
+══════════════════════════════════════════════ -->
+<section id="technologie" style="padding:96px 24px; background:var(--marine); overflow:hidden; position:relative;">
+
+  <div style="position:absolute; bottom:0; right:0; width:40%; height:50%; border-radius:50%; background:radial-gradient(ellipse, rgba(52,154,218,0.05) 0%, transparent 70%); pointer-events:none;"></div>
+
+  <div style="max-width:1280px; margin:0 auto; position:relative; z-index:1;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;">
+
+      <!-- Left: content -->
+      <div>
+        <div class="section-label light reveal" style="margin-bottom:12px;">Nos progrès</div>
+        <h2 class="reveal reveal-d1" style="font-weight:900; font-size:clamp(1.8rem,3vw,2.6rem); color:white; margin-bottom:24px;">
+          De la preuve de concept au produit commercial.<br></span>
+        </h2>
+        <p class="reveal reveal-d2" style="font-size:1rem; line-height:1.85; color:rgba(255,255,255,0.58); margin-bottom:48px;">
+          En moins d'un an, Seanetik est passé d'une idée à un prototype testé sur une vraie coque. La version 2 est en développement. L'élan est là. 
+        </p>
+
+        <!-- V1 → V2 visual progression -->
+        <div class="reveal reveal-d3">
+
+          <!-- V1: Accomplished -->
+          <div style="display:flex; gap:18px; align-items:flex-start; padding:20px 24px; background:rgba(126,198,54,0.1); border:1.5px solid rgba(126,198,54,0.28); border-radius:12px;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:var(--vert); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--vert); letter-spacing:0.06em; margin-bottom:4px; text-transform:uppercase;">Accompli</div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.75rem; font-weight:700; color:white; margin-bottom:4px;">Prototype V1 testé en conditions réelles</div>
+              <div style="font-size:0.85rem; color:rgba(255,255,255,0.5); line-height:1.6;">Port de Québec, novembre 2024. Validation fonctionnelle complète.</div>
+            </div>
+          </div>
+
+          <!-- Arrow connector — draw animation -->
+          <div style="display:flex; justify-content:flex-start; padding:8px 0 8px 29px;">
+            <svg id="arrow-v1v2" width="20" height="28" viewBox="0 0 20 28" fill="none">
+              <line class="arrow-line" x1="10" y1="0" x2="10" y2="20"
+                stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+              <polyline class="arrow-head" points="4,18 10,26 16,18"
+                stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- V2: In progress -->
+          <div style="display:flex; gap:18px; align-items:flex-start; padding:20px 24px; background:rgba(52,154,218,0.08); border:1.5px solid rgba(52,154,218,0.25); border-radius:12px;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:rgba(52,154,218,0.2); border:2px solid var(--azure); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--azure)" stroke-width="2.5">
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--azure); letter-spacing:0.06em; margin-bottom:4px; text-transform:uppercase;">En cours</div>
+              <div style="font-family:'Orbitron',monospace; font-size:0.75rem; font-weight:700; color:white; margin-bottom:4px;">Robot V2 en développement</div>
+              <div style="font-size:0.85rem; color:rgba(255,255,255,0.5); line-height:1.6;">Une version repensée, plus agile et plus capable, conçue pour répondre aux exigences des grandes flottes commerciales.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: two-photo collage — flow layout (always both visible) -->
+      <div class="tilt-collage" style="position:relative; display:flex; flex-direction:column; gap:0; padding-bottom:4px;">
+
+        <!-- Photo 1: top-left, tilted left — team on quay -->
+        <div class="reveal" style="position:relative; width:78%; align-self:flex-start; border-radius:16px; overflow:hidden; box-shadow:0 20px 56px rgba(0,0,0,0.6), 0 0 0 3px rgba(52,154,218,0.2); transform:rotate(-3deg); z-index:2;">
+          <img src="assets/images/IMG_2854.jpeg" alt="Équipe Seanetik — quai Port de Québec"
+            style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;">
+          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(13,30,46,0.65) 0%, transparent 55%);"></div>
+          <div style="position:absolute; bottom:12px; left:14px;">
+            <span style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; color:rgba(255,255,255,0.6); letter-spacing:0.1em; text-transform:uppercase;">Équipe · Port de Québec</span>
+          </div>
+        </div>
+
+        <!-- Photo 2: bottom-right, tilted right — robot in water (offset up for visual overlap) -->
+        <div class="reveal reveal-d2" style="position:relative; width:78%; align-self:flex-end; margin-top:-14%; border-radius:16px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); transform:rotate(2.5deg); z-index:1;">
+          <img src="assets/images/IMG_2892.jpeg" alt="Robot V1 Seanetik dans l'eau"
+            style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;">
+          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(13,30,46,0.65) 0%, transparent 55%);"></div>
+          <div style="position:absolute; bottom:12px; left:14px; display:flex; align-items:center; gap:8px;">
+            <div style="width:6px; height:6px; border-radius:50%; background:var(--vert);"></div>
+            <span style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.1em; text-transform:uppercase;">V1 · Test terrain · Nov. 2024</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #technologie > div > div { grid-template-columns: 1fr !important; }
+      #technologie > div > div > div:last-child { height: auto !important; margin-top: 32px; }
+    }
+    /* Progrès collage mobile — disable overlap so both photos are always fully visible */
+    @media (max-width: 640px) {
+      .tilt-collage { transform: none !important; }
+      .tilt-collage > div { width: 90% !important; align-self: center !important; margin-top: 0 !important; transform: none !important; }
+      .tilt-collage > div + div { margin-top: 16px !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     VALIDATION & TRACTION
+══════════════════════════════════════════════ -->
+<section id="validation" style="padding:96px 24px; background:var(--blanc); overflow:hidden;">
+  <div style="max-width:1280px; margin:0 auto;">
+
+    <div class="reveal" style="text-align:center; margin-bottom:72px;">
+      <div class="section-label" style="margin-bottom:12px;">Validation & Traction</div>
+      <h2 style="font-weight:800; font-size:clamp(1.8rem,3.5vw,2.8rem); color:var(--marine); margin-bottom:16px;">
+        La traction ne ment pas.
+      </h2>
+      <p style="font-size:1rem; color:var(--ardoise); line-height:1.75; max-width:580px; margin:0 auto;">
+        Un prototype testé en conditions réelles, des armateurs qui attendent la solution, et un écosystème maritime qui nous pousse dans le dos.
+      </p>
+    </div>
+
+    <!-- Testimonials — cartes claires avec guillemet visible -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-bottom:56px;">
+      <div class="testimonial reveal">
+        <div class="quote-mark">"</div>
+        <p style="font-size:1.05rem; color:var(--marine); line-height:1.78; font-weight:500; margin-bottom:20px;">
+          La solution développée par Seanetik serait un véritable atout pour des armateurs comme nous.
+        </p>
+        <div style="padding-top:16px; border-top:1px solid rgba(52,154,218,0.45);">
+          <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--marine); letter-spacing:0.05em;">Glen Robitaille</div>
+          <div style="font-size:0.78rem; color:var(--gris); margin-top:3px;">Directeur — Productivité de la flotte · <span style="color:var(--azure); font-weight:600;">Fednav</span></div>
+        </div>
+      </div>
+      <div class="testimonial reveal reveal-d1">
+        <div class="quote-mark">"</div>
+        <p style="font-size:1.05rem; color:var(--marine); line-height:1.78; font-weight:500; margin-bottom:20px;">
+          Si votre robot peut nettoyer mes navires, je l'achète !
+        </p>
+        <div style="padding-top:16px; border-top:1px solid rgba(52,154,218,0.45);">
+          <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--marine); letter-spacing:0.05em;">Patrick Chabot</div>
+          <div style="font-size:0.78rem; color:var(--gris); margin-top:3px;">Directeur — Renouvellement de la flotte · <span style="color:var(--azure); font-weight:600;">Groupe OCEAN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POC photo + milestones -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;">
+
+      <!-- Photo -->
+      <div class="reveal">
+        <div style="position:relative; border-radius:18px; overflow:hidden; box-shadow:0 12px 48px rgba(13,30,46,0.15);">
+          <img src="assets/images/_DSC8062 laureats de Defi-Quebec .jpg"
+            alt="Équipe Seanetik — Défi Québec"
+            style="width:100%; aspect-ratio:16/9; object-fit:cover; object-position:center top; display:block;">
+          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(13,30,46,0.7) 0%, transparent 50%);"></div>
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:20px 24px;">
+            <div style="font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; color:var(--vert); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:4px;">✓ Soutien de la ville de québec</div>
+            <div style="font-size:0.85rem; color:rgba(255,255,255,0.85); font-weight:500;">Québec · Février 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestones -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="reveal" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex-shrink:0; width:52px; height:52px; background:linear-gradient(135deg,#1a6fa8,#0d4e7a); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(52,154,218,0.3);">
+            <span style="font-family:'Orbitron',monospace; font-size:0.42rem; font-weight:900; color:white; letter-spacing:0.04em; text-align:center; line-height:1.3;">OCEAN<br>START.</span>
+          </div>
+          <div>
+            <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--marine); letter-spacing:0.04em; margin-bottom:4px;">Ocean Startup Project</div>
+            <div style="font-size:0.87rem; color:var(--ardoise); line-height:1.65;">Sélectionnés parmi 15 startups innovantes à travers le Canada.</div>
+          </div>
+        </div>
+        <div class="reveal reveal-d1" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex-shrink:0; width:52px; height:52px; background:linear-gradient(135deg,#002855,#004b9d); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,40,85,0.28);">
+            <span style="font-family:'Orbitron',monospace; font-size:0.42rem; font-weight:900; color:white; letter-spacing:0.04em; text-align:center; line-height:1.3;">VILLE<br>DE QC</span>
+          </div>
+          <div>
+            <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--marine); letter-spacing:0.04em; margin-bottom:4px;">Ville de Québec</div>
+            <div style="font-size:0.87rem; color:var(--ardoise); line-height:1.65;">Soutenus par la Ville de Québec, qui mise sur Seanetik pour faire du Saint-Laurent un corridor maritime propre de référence.</div>
+          </div>
+        </div>
+        <div class="reveal reveal-d2" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex-shrink:0; width:52px; height:52px; background:linear-gradient(135deg,#c8102e,#8a0b20); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(200,16,46,0.28);">
+            <span style="font-family:'Orbitron',monospace; font-size:0.42rem; font-weight:900; color:white; letter-spacing:0.04em; text-align:center; line-height:1.3;">BN<br>ACET</span>
+          </div>
+          <div>
+            <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--marine); letter-spacing:0.04em; margin-bottom:4px;">ACET · Banque Nationale</div>
+            <div style="font-size:0.87rem; color:var(--ardoise); line-height:1.65;">Accompagnés par l'incubateur ACET en partenariat avec la Banque Nationale.</div>
+          </div>
+        </div>
+        <div class="reveal reveal-d3" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex-shrink:0; width:52px; height:52px; background:linear-gradient(135deg,#1a3a5c,#0d2840); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(13,30,46,0.32);">
+            <span style="font-family:'Orbitron',monospace; font-size:0.42rem; font-weight:900; color:white; letter-spacing:0.04em; text-align:center; line-height:1.3;">PORT<br>DE QC</span>
+          </div>
+          <div>
+            <div style="font-family:'Orbitron',monospace; font-size:0.65rem; font-weight:700; color:var(--marine); letter-spacing:0.04em; margin-bottom:4px;">Port de Québec</div>
+            <div style="font-size:0.87rem; color:var(--ardoise); line-height:1.65;">Partenaire terrain de lancement — ancrage stratégique au cœur du Saint-Laurent.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #validation > div > div:nth-child(2) { grid-template-columns: 1fr !important; }
+      #validation > div > div:last-child { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     IMPACT ENVIRONNEMENTAL
+══════════════════════════════════════════════ -->
+<section id="impact" style="padding:96px 24px; background:var(--marine); position:relative; overflow:hidden;">
+
+  <!-- Background image -->
+  <div style="position:absolute; inset:0;">
+    <img src="assets/images/env_stlaurent_view_hill.jpg" alt="Saint-Laurent"
+      style="width:100%; height:100%; object-fit:cover; opacity:0.18; object-position:center 30%;">
+    <div style="position:absolute; inset:0; background:linear-gradient(140deg, rgba(13,30,46,0.96) 0%, rgba(13,30,46,0.82) 100%);"></div>
+  </div>
+
+  <div style="max-width:1280px; margin:0 auto; position:relative; z-index:1;">
+
+    <div class="reveal" style="text-align:center; margin-bottom:72px;">
+      <div class="section-label light" style="margin-bottom:12px;">Impact environnemental</div>
+      <h2 style="font-weight:800; font-size:clamp(1.7rem,3.2vw,2.8rem); color:white; margin-bottom:16px;">
+        Le CO₂ qu'on ne verra jamais<br>
+        <span style="color:var(--vert);">dans l'atmosphère.</span>
+      </h2>
+    </div>
+
+    <!-- Side-by-side visual equation -->
+    <div class="reveal" style="display:flex; align-items:stretch; justify-content:center; gap:0; margin-bottom:56px; flex-wrap:wrap;">
+
+      <!-- Left: Ship side — real photo background -->
+      <div style="flex:1; min-width:260px; max-width:380px; position:relative; overflow:hidden; border-radius:20px 0 0 20px; min-height:400px;">
+        <img src="assets/images/env_cargo_open_sea.jpg" alt="Cargo en mer"
+          style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center;">
+        <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(13,30,46,0.55) 0%, rgba(13,30,46,0.82) 55%, rgba(13,30,46,0.92) 100%);"></div>
+        <div style="position:relative; z-index:1; text-align:center; padding:48px 40px;">
+          <div style="font-family:'Orbitron',monospace; font-weight:900; font-size:clamp(3rem,6vw,5rem); color:var(--vert); letter-spacing:-0.04em; line-height:1; margin-bottom:12px;">8M</div>
+          <div style="font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; color:white; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:8px;">Tonnes de CO₂</div>
+          <div style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.65;">éliminées par année sur le Saint-Laurent</div>
+        </div>
+      </div>
+
+      <!-- Equals sign -->
+      <div style="display:flex; align-items:center; justify-content:center; width:80px; flex-shrink:0; z-index:1;">
+        <div style="background:var(--azure); width:68px; height:68px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 10px rgba(52,154,218,0.14), 0 8px 36px rgba(52,154,218,0.35);">
+          <span style="font-family:'Orbitron',monospace; font-weight:600; font-size:3rem; color:white; line-height:1;">=</span>
+        </div>
+      </div>
+
+      <!-- Right: Car side — real photo background -->
+      <div style="flex:1; min-width:260px; max-width:380px; position:relative; overflow:hidden; border-radius:0 20px 20px 0; min-height:300px;">
+        <img src="assets/images/voitures_polutions.jpg" alt="Voitures et pollution"
+          style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center;">
+        <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(13,30,46,0.55) 0%, rgba(13,30,46,0.82) 55%, rgba(13,30,46,0.92) 100%);"></div>
+        <div style="position:relative; z-index:1; text-align:center; padding:48px 40px;">
+          <div style="font-family:'Orbitron',monospace; font-weight:900; font-size:clamp(3rem,6vw,5rem); color:var(--vert); letter-spacing:-0.04em; line-height:1; margin-bottom:12px;">50%</div>
+          <div style="font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; color:white; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:8px;">Des voitures du Québec</div>
+          <div style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.65;">retirées des routes</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- "Imaginez à l'international" + CTA -->
+    <div class="reveal" style="text-align:center;">
+      <p style="font-family:'Orbitron',monospace; font-size:clamp(0.95rem,1.8vw,1.3rem); font-weight:700; color:rgba(255,255,255,0.6); letter-spacing:0.04em; margin-bottom:36px; font-style:italic;">
+        Imaginez à l'international.
+      </p>
+      <a href="#contact" class="btn-primary" style="display:inline-flex;">
+        Contribuer à la mission
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #impact > div > div:nth-child(2) { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     L'ÉQUIPE
+══════════════════════════════════════════════ -->
+<section id="equipe" style="padding:96px 24px; background:var(--brume); overflow:hidden;">
+  <div style="max-width:1280px; margin:0 auto;">
+
+    <div class="reveal" style="text-align:center; margin-bottom:64px;">
+      <div class="section-label" style="margin-bottom:12px;">L'équipe</div>
+      <h2 style="font-weight:800; font-size:clamp(1.8rem,3.5vw,2.8rem); color:var(--marine); margin-bottom:16px;">
+        Huit passionnés. Une mission.
+      </h2>
+      <p style="font-size:1rem; color:var(--ardoise); line-height:1.75; max-width:560px; margin:0 auto;">
+        On s'est rencontrés sur les bancs de l'université. On a décidé de ne pas attendre la fin de nos études pour changer les choses.
+      </p>
+    </div>
+
+    <!-- Group photo -->
+    <div class="reveal" style="margin-bottom:64px;">
+      <div style="position:relative; border-radius:20px; overflow:hidden; max-width:800px; margin:0 auto; box-shadow:0 12px 48px rgba(13,30,46,0.15);">
+        <img src="assets/images/IMG_3491.jpeg" alt="L'équipe Seanetik"
+          style="width:100%; aspect-ratio:16/9; object-fit:cover; object-position:center 20%; display:block;">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(13,30,46,0.65) 0%, transparent 50%);"></div>
+        <div style="position:absolute; bottom:0; left:0; right:0; text-align:center; padding:20px;">
+          <span style="font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; color:rgba(255,255,255,0.65); letter-spacing:0.14em; text-transform:uppercase;">Institut Maritime du Québec · Rimouski</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team grid -->
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
+
+      <!-- Row 1: C-suite -->
+      <div class="team-card reveal">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/Maxime%20Leblanc.jpg" alt="Maxime Leblanc"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Maxime Leblanc</div>
+          <div style="font-size:0.65rem; color:var(--azure); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin:3px 0;">CEO</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Développement des affaires & relations clients</div>
+        </div>
+      </div>
+
+      <div class="team-card reveal reveal-d2">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/J%C3%A9r%C3%A9mie%20L%C3%A9vesque.JPG" alt="Jérémie Lévesque"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Jérémie Lévesque</div>
+          <div style="font-size:0.65rem; color:var(--azure); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin:3px 0;">COO</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Opérations, image de marque & communications</div>
+        </div>
+      </div>
+
+      <div class="team-card reveal reveal-d1">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/Alexandre%20Corriveau.jpg" alt="Alexandre Corriveau"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Alexandre Corriveau</div>
+          <div style="font-size:0.65rem; color:var(--azure); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin:3px 0;">CTO</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Innovation, recherche & développement</div>
+        </div>
+      </div>
+
+      <div class="team-card reveal reveal-d3">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/F%C3%A9lix%20Choquette.jpg" alt="Félix Choquette"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Félix Choquette</div>
+          <div style="font-size:0.65rem; color:var(--azure); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin:3px 0;">CFO</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Finances, tests & KPIs</div>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="team-card reveal">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/Mika%C3%ABl%20Guillet.jpeg" alt="Mikaël Guillet"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Mikaël Guillet</div>
+          <div style="font-size:0.65rem; color:var(--azure); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin:3px 0;">CPO</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Intégration technique & gestion de projet</div>
+        </div>
+      </div>
+
+      <div class="team-card reveal reveal-d1">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/Julien%20Carrier.png" alt="Julien Carrier"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Julien Carrier</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Électrique & motorisation</div>
+        </div>
+      </div>
+
+      <div class="team-card reveal reveal-d2">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/Catherina%20Bilodeau.png" alt="Catherina Bilodeau"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Catherina Bilodeau</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Planification, échéanciers & coordination</div>
+        </div>
+      </div>
+
+      <div class="team-card reveal reveal-d3">
+        <div style="aspect-ratio:1; background:var(--marine); overflow:hidden;">
+          <img src="assets/images/Photo%20individuel/Portrait%20Aur%C3%A9lie.JPG" alt="Aurélie Beaulieu-Bouchard"
+            style="width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block;">
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.62rem; font-weight:700; color:var(--marine); letter-spacing:0.02em;">Aurélie Beaulieu-Bouchard</div>
+          <div style="font-size:0.78rem; color:var(--gris); line-height:1.5;">Logiciel & vision embarquée</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 900px) {
+      #equipe > div > div:last-child { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 480px) {
+      #equipe > div > div:last-child { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     COMMANDITAIRES
+══════════════════════════════════════════════ -->
+<section id="commanditaires" style="padding:96px 24px; background:white;">
+  <div style="max-width:1280px; margin:0 auto;">
+
+    <div class="reveal" style="text-align:center; margin-bottom:80px;">
+      <div class="section-label" style="margin-bottom:12px;">Commanditaires</div>
+      <h2 style="font-weight:800; font-size:clamp(1.8rem,3vw,2.6rem); color:var(--marine);">Nos commanditaires</h2>
+    </div>
+
+    <!-- ── TIER 1 : CAPITAINE ── -->
+    <div class="reveal" style="margin-bottom:72px;">
+      <div style="text-align:center; margin-bottom:28px;">
+        <span style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,rgba(255,200,0,0.1),rgba(255,160,0,0.08)); border:1.5px solid rgba(255,180,0,0.35); border-radius:100px; padding:8px 22px; font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; color:#b8860b; letter-spacing:0.16em; text-transform:uppercase;">
+          ★ Niveau Capitaine
+        </span>
+      </div>
+      <div style="display:flex; justify-content:center;">
+        <div style="background:linear-gradient(145deg,#fffbf0,#fff8e0); border:2px solid rgba(255,180,0,0.3); border-radius:20px; padding:52px 80px; text-align:center; min-width:320px; max-width:480px; box-shadow:0 8px 40px rgba(200,150,0,0.1), 0 2px 8px rgba(200,150,0,0.06);">
+          <img src="assets/images/Logo%20partenaires/Commandites/cta_brp.jpg" alt="CTA / BRP"
+            style="height:120px; max-width:300px; width:100%; object-fit:contain; display:block; margin:0 auto 20px;">
+          <div style="font-family:'Orbitron',monospace; font-size:1.05rem; font-weight:800; color:var(--marine); letter-spacing:-0.02em;">CTA / BRP</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TIER 2 : OFFICIER ── -->
+    <div class="reveal" style="margin-bottom:56px;">
+      <div style="text-align:center; margin-bottom:24px;">
+        <span style="display:inline-flex; align-items:center; gap:8px; background:rgba(52,154,218,0.07); border:1.5px solid rgba(52,154,218,0.22); border-radius:100px; padding:7px 20px; font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; color:var(--azure); letter-spacing:0.16em; text-transform:uppercase;">
+          ◈ Niveau Officier
+        </span>
+      </div>
+      <div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap;">
+        <div style="background:var(--brume); border:1.5px solid rgba(52,154,218,0.18); border-radius:16px; padding:36px 56px; text-align:center; min-width:220px; max-width:280px;">
+          <img src="assets/images/Logo%20partenaires/Commandites/beckhoff.png" alt="Beckhoff"
+            style="height:100px; max-width:220px; width:100%; object-fit:contain; display:block; margin:0 auto 16px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.85rem; font-weight:700; color:var(--marine);">Beckhoff</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TIER 3 : MOUSAILLON ── -->
+    <div class="reveal">
+      <div style="text-align:center; margin-bottom:24px;">
+        <span style="display:inline-flex; align-items:center; gap:8px; background:rgba(122,154,176,0.08); border:1.5px solid rgba(122,154,176,0.2); border-radius:100px; padding:7px 20px; font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; color:var(--gris); letter-spacing:0.16em; text-transform:uppercase;">
+          ⚓ Niveau Mousaillon
+        </span>
+      </div>
+      <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+        <div class="sponsor-card">
+          <img src="assets/images/Logo%20partenaires/Commandites/mecan_hydro.png" alt="Mécan-hydro"
+            style="height:72px; max-width:160px; width:100%; object-fit:contain; display:block; margin:0 auto 14px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700; color:var(--marine);">Mécan-hydro</div>
+        </div>
+        <div class="sponsor-card">
+          <img src="assets/images/Logo%20partenaires/Commandites/steke.png" alt="Steke"
+            style="height:72px; max-width:160px; width:100%; object-fit:contain; display:block; margin:0 auto 14px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700; color:var(--marine);">Steke</div>
+        </div>
+        <div class="sponsor-card">
+          <img src="assets/images/Logo%20partenaires/Commandites/estampro.png" alt="Estampro"
+            style="height:72px; max-width:160px; width:100%; object-fit:contain; display:block; margin:0 auto 14px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700; color:var(--marine);">Estampro</div>
+        </div>
+        <div class="sponsor-card">
+          <img src="assets/images/Logo%20partenaires/Commandites/acier_simmonds.png" alt="Acier Simmonds"
+            style="height:72px; max-width:160px; width:100%; object-fit:contain; display:block; margin:0 auto 14px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700; color:var(--marine);">Acier Simmonds</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     PARTENAIRES
+══════════════════════════════════════════════ -->
+<section id="partenaires" style="padding:72px 0; background:var(--brume); border-top:1px solid rgba(52,154,218,0.08);">
+  <div style="max-width:1252px; margin:0 auto 40px; padding:0 24px; text-align:center;" class="reveal">
+    <div class="section-label" style="margin-bottom:12px;">Partenaires</div>
+    <h2 style="font-weight:800; font-size:clamp(1.5rem,2.5vw,2rem); color:var(--marine);">Ils nous font confiance.</h2>
+  </div>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <!-- Set 1 -->
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/ville_de_quebec.png" alt="Ville de Québec"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/OSP.png" alt="Ocean Startup Project"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/ferique.png" alt="FÉRIQUE"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/uds.png" alt="Université de Sherbrooke"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/mitacs.png" alt="Mitacs"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/labs4.png" alt="Labs4"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/port_de_qc.png" alt="Port de Québec"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/ultratech_maritime.jpg" alt="Ultratech Maritime"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/groupe_ocean.png" alt="Groupe OCEAN"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/estm_horizon.png" alt="ETSM Horizon Formation"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/transport_canada.png" alt="Transport Canada"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/innovation_maritime.jpg" alt="Innovation Maritime"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/crvi.jpg" alt="CRVI"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/merinov.png" alt="Merinov"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/parcours_est.png" alt="Parcours EST UdeS"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/acet.jpg" alt="ACET · Banque Nationale"></span><span class="partner-sep">·</span>
+      <!-- Set 2 (duplicate for seamless loop) -->
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/ville_de_quebec.png" alt="Ville de Québec"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/OSP.png" alt="Ocean Startup Project"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/ferique.png" alt="FÉRIQUE"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/uds.png" alt="Université de Sherbrooke"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/mitacs.png" alt="Mitacs"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/labs4.png" alt="Labs4"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/port_de_qc.png" alt="Port de Québec"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/ultratech_maritime.jpg" alt="Ultratech Maritime"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/groupe_ocean.png" alt="Groupe OCEAN"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/estm_horizon.png" alt="ETSM Horizon Formation"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/transport_canada.png" alt="Transport Canada"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/innovation_maritime.jpg" alt="Innovation Maritime"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/crvi.jpg" alt="CRVI"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/merinov.png" alt="Merinov"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/parcours_est.png" alt="Parcours EST UdeS"></span><span class="partner-sep">·</span>
+      <span class="partner-item"><img src="assets/images/Logo%20partenaires/Partenaires/acet.jpg" alt="ACET · Banque Nationale"></span><span class="partner-sep">·</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     CONTACT
+══════════════════════════════════════════════ -->
+<section id="contact" style="padding:96px 24px; background:white;">
+  <div style="max-width:1280px; margin:0 auto;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start;">
+
+      <!-- Left: form -->
+      <div class="reveal">
+        <div class="section-label" style="margin-bottom:12px;">Contact</div>
+        <h2 style="font-weight:800; font-size:clamp(1.8rem,3vw,2.6rem); color:var(--marine); margin-bottom:16px;">
+          Prêts à collaborer ?
+        </h2>
+        <p style="font-size:1rem; color:var(--ardoise); line-height:1.8; margin-bottom:40px;">
+          Que vous soyez armateur, agence maritime ou investisseur, nous sommes prêts à discuter de la façon dont Seanetik peut faire une différence.
+        </p>
+
+        <form onsubmit="handleSubmit(event)">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label class="form-label">Nom</label>
+              <input type="text" class="form-input" placeholder="Votre nom" required>
+            </div>
+            <div>
+              <label class="form-label">Entreprise</label>
+              <input type="text" class="form-input" placeholder="Votre entreprise">
+            </div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="votre@email.com" required>
+          </div>
+          <div style="margin-bottom:24px;">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" rows="5" placeholder="Votre message..." style="resize:vertical;" required></textarea>
+          </div>
+          <button type="submit" id="submit-btn" class="btn-primary" style="width:100%; justify-content:center; padding:16px;">
+            Envoyer le message
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Right: info -->
+      <div class="reveal reveal-d1">
+        <!-- Contact card -->
+        <div style="background:var(--marine); border-radius:18px; padding:36px; margin-bottom:20px; box-shadow:0 8px 40px rgba(13,30,46,0.18);">
+          <div style="font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; color:var(--gris); letter-spacing:0.16em; text-transform:uppercase; margin-bottom:16px;">Contact principal</div>
+          <div style="font-family:'Orbitron',monospace; font-weight:700; font-size:0.95rem; color:white; margin-bottom:4px;">Maxime Leblanc</div>
+          <div style="font-size:0.82rem; color:var(--gris); margin-bottom:20px;">CEO — Développement des affaires</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="mailto:Maxime.Leblanc@seanetik.com"
+              style="display:flex; align-items:center; gap:10px; color:var(--azure); font-size:0.875rem; text-decoration:none; transition:color 0.2s ease;"
+              onmouseover="this.style.color='#7EC636'" onmouseout="this.style.color='#349ADA'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Maxime.Leblanc@seanetik.com
+            </a>
+            <a href="tel:+14502101500"
+              style="display:flex; align-items:center; gap:10px; color:var(--azure); font-size:0.875rem; text-decoration:none; transition:color 0.2s ease;"
+              onmouseover="this.style.color='#7EC636'" onmouseout="this.style.color='#349ADA'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-2.99-8.59A2 2 0 012.07 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              (+1) 450-210-1500
+            </a>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.07); margin-top:24px; padding-top:20px;">
+            <div style="font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; color:var(--gris); letter-spacing:0.16em; text-transform:uppercase; margin-bottom:10px;">Email général</div>
+            <a href="mailto:info@seanetik.com"
+              style="color:var(--azure); font-size:0.9rem; text-decoration:none; transition:color 0.2s ease;"
+              onmouseover="this.style.color='#7EC636'" onmouseout="this.style.color='#349ADA'">
+              info@seanetik.com
+            </a>
+          </div>
+        </div>
+
+        <!-- Location card -->
+        <div style="background:rgba(126,198,54,0.06); border:1.5px solid rgba(126,198,54,0.2); border-radius:12px; padding:22px 24px;">
+          <div style="font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; color:var(--vert); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:8px;">Basés au Québec</div>
+          <p style="font-size:0.875rem; color:var(--ardoise); line-height:1.72; margin:0;">
+            Québec, Canada<br>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #contact > div > div { grid-template-columns: 1fr !important; gap: 48px !important; }
+    }
+  </style>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer style="background:var(--marine); padding:64px 24px 32px;">
+  <div style="max-width:1280px; margin:0 auto;">
+
+    <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:64px; margin-bottom:56px;">
+
+      <!-- Brand -->
+      <div>
+        <img src="seanetik_logo_vertical_blanc_8192.png" alt="Seanetik" style="height:60px; margin-bottom:20px; display:block;">
+        <p style="font-size:0.875rem; color:rgba(255,255,255,0.4); line-height:1.8; max-width:320px; margin:0 0 12px;">
+          Technologies Seanetik Inc.<br>
+          Nettoyage de coque robotisé avec capture des biosalissures.
+        </p>
+        <p style="font-size:0.85rem; color:var(--vert); font-style:italic; margin:0; opacity:0.85;">Beneath the blue, we think green.</p>
+      </div>
+
+      <!-- Nav -->
+      <div>
+        <div style="font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--gris); margin-bottom:20px;">Navigation</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="#probleme" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Problème</a>
+          <a href="#solution" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Solution</a>
+          <a href="#validation" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Validation</a>
+          <a href="#impact" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Impact</a>
+          <a href="#equipe" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Équipe</a>
+          <a href="#contact" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Contact</a>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <div style="font-family:'Orbitron',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--gris); margin-bottom:20px;">Contact</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="mailto:info@seanetik.com" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='#349ADA'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">info@seanetik.com</a>
+          <a href="tel:+14502101500" style="font-size:0.85rem; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s ease;" onmouseover="this.style.color='#349ADA'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">(+1) 450-210-1500</a>
+          <span style="font-size:0.85rem; color:rgba(255,255,255,0.25);">Québec, Canada</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:24px; display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center;">
+      <div style="font-family:'Orbitron',monospace; font-size:0.6rem; color:rgba(255,255,255,0.2); letter-spacing:0.08em;">
+        © 2025 Technologies Seanetik Inc. · Marque enregistrée · Québec, Canada
+      </div>
+      <div style="display:flex; gap:5px; align-items:center;">
+        <div style="width:6px; height:6px; border-radius:50%; background:var(--azure); opacity:0.55;"></div>
+        <div style="width:6px; height:6px; border-radius:50%; background:var(--vert); opacity:0.55;"></div>
+        <div style="width:6px; height:6px; border-radius:50%; background:var(--gris); opacity:0.35;"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script>
+  // ─── Navbar scroll ───
+  const navbar = document.getElementById('navbar');
+  const logoDark = document.getElementById('logo-dark');
+  const logoWhite = document.getElementById('logo-white');
+  const mobileBtn = document.getElementById('mobile-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.classList.add('scrolled');
+      logoDark.style.display = 'block';
+      logoWhite.style.display = 'none';
+      mobileBtn.style.color = 'var(--ardoise)';
+    } else {
+      navbar.classList.remove('scrolled');
+      logoDark.style.display = 'none';
+      logoWhite.style.display = 'block';
+      mobileBtn.style.color = 'white';
+    }
+  });
+
+  // ─── Mobile menu ───
+  mobileBtn.style.display = 'block';
+  mobileBtn.addEventListener('click', () => {
+    const open = mobileMenu.style.display === 'block';
+    mobileMenu.style.display = open ? 'none' : 'block';
+  });
+  // Hide on md+ (simplified)
+  function checkWidth() {
+    if (window.innerWidth >= 768) {
+      mobileBtn.style.display = 'none';
+      mobileMenu.style.display = 'none';
+    } else {
+      mobileBtn.style.display = 'block';
+    }
+  }
+  checkWidth();
+  window.addEventListener('resize', checkWidth);
+
+  // ─── Scroll reveal ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ─── Form submit ───
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    btn.innerHTML = '✓ Message envoyé !';
+    btn.style.background = 'var(--vert)';
+    btn.style.boxShadow = '0 6px 24px rgba(126,198,54,0.4)';
+    btn.disabled = true;
+  }
+
+  // ─── Smooth close mobile menu on link click ───
+  document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => { mobileMenu.style.display = 'none'; });
+  });
+
+  // ─── 3. Nav active section highlight ───
+  const allSections = document.querySelectorAll('section[id]');
+  const allNavLinks = document.querySelectorAll('.nav-link');
+  const activeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        allNavLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-35% 0px -60% 0px', threshold: 0 });
+  allSections.forEach(s => activeObserver.observe(s));
+
+  // ─── 5. Hero parallax ───
+  const heroBg = document.getElementById('hero-bg');
+  const heroSection = heroBg ? heroBg.closest('section') : null;
+  function updateParallax() {
+    if (!heroBg || !heroSection) return;
+    const scrollY = window.scrollY;
+    const heroH = heroSection.offsetHeight;
+    if (scrollY < heroH * 1.5) {
+      heroBg.style.transform = 'translateY(' + (scrollY * 0.28) + 'px)';
+    }
+  }
+  window.addEventListener('scroll', updateParallax, { passive: true });
+
+  // ─── 4. 3D Tilt on technologie collage ───
+  document.querySelectorAll('.tilt-collage').forEach(card => {
+    let tiltRaf = null;
+    card.addEventListener('mousemove', (e) => {
+      if (tiltRaf) cancelAnimationFrame(tiltRaf);
+      tiltRaf = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        const dx = (e.clientX - rect.left - rect.width  / 2) / (rect.width  / 2);
+        const dy = (e.clientY - rect.top  - rect.height / 2) / (rect.height / 2);
+        card.style.transition = 'none';
+        card.style.transform = 'perspective(900px) rotateY(' + (dx * 5) + 'deg) rotateX(' + (-dy * 5) + 'deg)';
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      if (tiltRaf) cancelAnimationFrame(tiltRaf);
+      card.style.transition = 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      card.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg)';
+    });
+  });
+
+  // ─── 7. Armateur hover — handled via CSS (.armateur-wow) ───
+
+  // ─── Marquee smooth rAF ───
+  (function() {
+    const track = document.querySelector('.marquee-track');
+    if (!track) return;
+    let x = 0;
+    let paused = false;
+    let half = 0;
+    const speed = 0.55;
+    const dpr = window.devicePixelRatio || 1;
+
+    track.addEventListener('mouseenter', () => { paused = true; });
+    track.addEventListener('mouseleave', () => { paused = false; });
+
+    Promise.all(
+      Array.from(track.querySelectorAll('img')).map(img =>
+        img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })
+      )
+    ).then(() => {
+      half = track.scrollWidth / 2;
+
+      function tick() {
+        if (!paused) {
+          x -= speed;
+          if (-x >= half) x += half;
+          // Snap to physical device pixel to avoid sub-pixel jitter on HiDPI/scaled displays
+          const snapped = Math.round(x * dpr) / dpr;
+          track.style.transform = 'translate3d(' + snapped + 'px, 0, 0)';
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  })();
+
+  // ─── Arrow V1→V2 draw animation ───
+  const arrowSvg = document.getElementById('arrow-v1v2');
+  if (arrowSvg) {
+    const arrowObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          arrowSvg.classList.add('drawn');
+          arrowObserver.disconnect();
+        }
+      });
+    }, { threshold: 1.0 });
+    arrowObserver.observe(arrowSvg);
+  }
+</script>
+
+</body>
+</html>
